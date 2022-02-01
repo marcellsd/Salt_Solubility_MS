@@ -255,3 +255,18 @@ def Pitzer_parameters_in_mixtures_SI(Beta_0_MX_H2O, Beta_1_MX_H2O, Cphi_MX_H2O, 
     for i in range(0, tamanho_v):
         Beta_1_MX_H2O_MEG[i] = exp(A*log(epsilon_r_H2O_MEG[i]) + B)
     return Beta_0_MX_H2O_MEG, Beta_1_MX_H2O_MEG, C_phi_MX_H2O_MEG
+
+
+def Pitzer_parameters_in_mixtures_exc_SI(Beta_0_MX_H2O, Beta_1_MX_H2O, Cphi_MX_H2O, Beta_1_MX_MEG, epsilon_r_H2O, epsilon_r_MEG, epsilon_r_H2O_MEG, x_MEG_SF):
+    # Calcula os parâmetros do Modelo de Pitzer em mistura H2O-MEG:
+    # => beta0_MX_H2O_MEG, beta1_MX_H2O_MEG e C_phi_MX_H2O_MEG
+    # => LORIMER, 1993
+    Beta_0_MX_H2O_MEG = Beta_0_MX_H2O
+    C_phi_MX_H2O_MEG = Cphi_MX_H2O
+    tamanho_v = len(x_MEG_SF)
+    Beta_1_MX_H2O_MEG = empty(tamanho_v)
+    A = log(Beta_1_MX_H2O/Beta_1_MX_MEG) / log(epsilon_r_H2O/epsilon_r_MEG)
+    B = log(Beta_1_MX_H2O) - A*log(epsilon_r_H2O)
+    for i in range(0, tamanho_v):
+        Beta_1_MX_H2O_MEG[i] = exp(A*log(epsilon_r_H2O_MEG[i]) + B)
+    return Beta_0_MX_H2O_MEG, Beta_1_MX_H2O_MEG, C_phi_MX_H2O_MEG

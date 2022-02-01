@@ -186,12 +186,11 @@ ln_b_MX_H2O_MEG_exc = excesso.ln_b_MX_H2O_MEG_exc(ln_b_MX_H2O_MEG_ideal, ln_b_MX
 potencial_quimico_exc = excesso.potencial_quimico_exc(ln_b_MX_H2O_MEG_exc, ln_gamma_MX_H2O_MEG_exc)
 
 #Quantidade de parametros potencial quimico (escolher 3 ou 2)
-n = 2
+n = 3
      
 Thetas_pot = excesso.regressao_n_linear_potencial_quimico_SI(potencial_quimico_exc, x_MEG_SF_All, n)
 
 pot_calc = excesso.func_potencial_quimico_exc_SI(x_MEG_SF_All, Thetas_pot, n)
-
 
 x_MEG = linspace( 0.0,1.0, 100, endpoint=True)
 
@@ -202,6 +201,41 @@ R_2_pot = estatistica.coef_determinacao2(potencial_quimico_exc, pot_calc)
 AAD_pot, maxAD_pot, AARD_pot, maxARD_pot = estatistica.DAM_DMR(potencial_quimico_exc, pot_calc)
 
 
+#Calculo solubilidade Mistura
+numero_de_pontos = 31
+
+x_MEG_SF_oti = linspace(0.0,1.0,numero_de_pontos,endpoint=True)
+x_H2O_SF_oti = 1-x_MEG_SF_oti
+w_MEG_SF_oti = transformacoes.w_MEG_SF(x_MEG_SF_oti)
+w_H2O_SF_oti = 1-w_MEG_SF_oti
+
+b_MX_H2O_MEG_otimizacao = empty(numero_de_pontos)
+gamma_MX_H2O_MEG_otimizacao = empty(numero_de_pontos)
+
+b_MX_H2O_MEG_otimizacao, gamma_MX_H2O_MEG_otimizacao = excesso.otimizacao_b_MX_H2O_MEG_SI(x_MEG_SF_oti, w_H2O_SF_oti, x_H2O_SF_oti, w_MEG_SF_oti, T_filtro[0], 
+                                                                                                     Thetas_pot, b_MX_H2O_mean, b_MX_MEG_mean, 
+                                                                                                     Beta_0_MX_H2O, Beta_1_MX_H2O, Cphi_MX_H2O,
+                                                                                                     Beta_0_MX_MEG, Beta_1_MX_MEG, Cphi_MX_MEG,
+                                                                                                     Zm, nu_M, nu_X, Zx, n)
+
+b_MX_H2O_MEG_est = empty(numero_de_pontos)
+gamma_MX_H2O_MEG_est = empty(numero_de_pontos)
+b_MX_H2O_MEG_est, gamma_MX_H2O_MEG_est = excesso.otimizacao_b_MX_H2O_MEG_SI(x_MEG_SF_All[:,0], w_H2O_SF_All_True[:,0], x_H2O_SF_All[:,0], w_MEG_SF_All_True[:,0], T_filtro[0], 
+                                                                                                     Thetas_pot, b_MX_H2O_mean, b_MX_MEG_mean, 
+                                                                                                     Beta_0_MX_H2O[0], Beta_1_MX_H2O[0], Cphi_MX_H2O[0],
+                                                                                                     Beta_0_MX_MEG[0], Beta_1_MX_MEG, Cphi_MX_MEG[0],
+                                                                                                     Zm, nu_M, nu_X, Zx, n)
+
+gamma_MX_H2O_MEG = exp(ln_gamma_MX_H2O_MEG)
+
+#Estatistica solubilidade e gamma
+R_2_b=estatistica.coef_determinacao2(b_MX_H2O_MEG, b_MX_H2O_MEG_est)
+R_2_gamma=estatistica.coef_determinacao2(gamma_MX_H2O_MEG, gamma_MX_H2O_MEG_est)
+AAD_b, maxAD_b, AARD_b, maxARD_b = estatistica.DAM_DMR(b_MX_H2O_MEG, b_MX_H2O_MEG_est)
+AAD_g, maxAD_g, AARD_g, maxARD_g = estatistica.DAM_DMR(gamma_MX_H2O_MEG, gamma_MX_H2O_MEG_est)
+
+print (f"R_2_b: {R_2_b:.4f}, R_2_gamma: {R_2_gamma:.4f}, R_Pot: {R_2_pot:.4f}")
+
 fig1 = plt.figure(1)      
 plt.figure(1)
 plt.xlabel("x_MEG_SF")
@@ -210,5 +244,29 @@ plt.plot(x_MEG_SF_All, potencial_quimico_exc, '.')
 plt.plot(x_MEG, pot_calc_plot, label=T_filtro)
 plt.title("Potenciais Quimicos Calc")
 plt.legend()
+
+
+#Grafico b
+fig2 = plt.figure(2)
+plt.xlabel("x_MEG_SF")
+plt.ylabel("b")
+plt.plot(x_MEG_SF_All, b_MX_H2O_MEG, '.')
+plt.plot(x_MEG_SF_oti, b_MX_H2O_MEG_otimizacao, label=T_filtro)
+plt.title("b_MX_H2O_MEG Calc")
+plt.legend()
+
+#Grafico gamma
+fig3 = plt.figure(3)
+plt.xlabel("x_MEG_SF")
+plt.ylabel("gamma")
+plt.plot(x_MEG_SF_All,gamma_MX_H2O_MEG, '.')
+plt.plot(x_MEG_SF_oti, gamma_MX_H2O_MEG_otimizacao, label=T_filtro)
+plt.title("gamma_MX_H2O_MEG Calc")
+plt.legend()
+
+
+
+
 plt.show()
 # %%
+
