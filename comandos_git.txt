@@ -7,3 +7,15 @@ Outras vezes : git push
 Mudar de branch: git checkout nomedabranch
 
 git status
+
+
+INSTALAR INTEGRAÇÃO GITHUB-VSCODE
+-baixar e instalar a distribuição git: https://git-scm.com/download/win
+-abrir o "Git Bash" pelo terminal e digitar
+  $ git config --global user.name "NOMEDACONTA"
+  $ git config --global user.email EMAILDACONTA
+-abrir VSCODE > File > Preferences > Open Settings (JSON) (Canto superior direito, icone de folha A4 com setinha)
+-adicionar as linhas no código que abre (Lembrar de colocar vírgula no final dos comandos)
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "terminal.integrated.tabs.enable": true
+No windows, aperta Ctrl+J para começar a usar ambiente git no VSCODE
