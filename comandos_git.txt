@@ -18,4 +18,5 @@ INSTALAR INTEGRAÇÃO GITHUB-VSCODE
 -adicionar as linhas no código que abre (Lembrar de colocar vírgula no final dos comandos)
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   "terminal.integrated.tabs.enable": true
-No windows, aperta Ctrl+J para começar a usar ambiente git no VSCODE
+Criar um novo terminal e verificar se está usando o "bash" ao invés do "powershell" (canto inf esq)
+Pronto
