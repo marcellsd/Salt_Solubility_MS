@@ -4,6 +4,17 @@ Commitar as midificações: git commit -m "comentário sobre as modificações"
 Subir o repositório pela primeira vez: git push --set-upstream origin nomedabranch
 Outras vezes : git push
 
-mudar de branch: git checkout nomedabranch
-
+Mudar de branch: git checkout nomedabranch
 git status
+
+INSTALAR INTEGRAÇÃO GITHUB-VSCODE
+-baixar e instalar a distribuição git: https://git-scm.com/download/win
+-abrir o "Git Bash" pelo terminal e digitar
+  $ git config --global user.name "NOMEDACONTA"
+  $ git config --global user.email EMAILDACONTA
+-abrir VSCODE > File > Preferences > Open Settings (JSON) (Canto superior direito, icone de folha A4 com setinha)
+-adicionar as linhas no código que abre (Lembrar de colocar vírgula no final dos comandos)
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "terminal.integrated.tabs.enable": true
+Criar um novo terminal e verificar se está usando o "bash" ao invés do "powershell" (canto inf esq)
+Pronto
