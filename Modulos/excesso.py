@@ -216,7 +216,6 @@ def ln_gamma_MX_H2O_MEG_exc_SI(ln_gamma_MX_H2O_MEG_ideal, ln_gamma_MX_H2O_MEG):
 
 
 
-
 def func_potencial_quimico_exc_SI(x_MEG_SF, Thetas_pot, n):
     if n == 2:
         pot_exc = x_MEG_SF*(1-x_MEG_SF)*(Thetas_pot[0]+(Thetas_pot[1])*x_MEG_SF)
@@ -262,3 +261,44 @@ def regressao_n_linear_potencial_quimico_SI(potencial_quimico_exc, x_MEG_SF, n):
     #Otimizador Determinístico
     Thetas_pot = minimize(fobjetivo_SI,x0,args=(potencial_quimico_exc, x_MEG_SF, n),method='Nelder-Mead', tol = 1e-7, options = {'xatol':1e-7, 'disp':True, 'maxiter': 2000})
     return Thetas_pot.x
+
+def otimizacao_b_MX_H2O_MEG_SI(x_MEG_SF, w_H2O_SF, x_H2O_SF, w_MEG_SF, T, 
+                            Thetas_pot, b_MX_H2O, b_MX_MEG, 
+                            Beta_0_MX_H2O, Beta_1_MX_H2O, Cphi_MX_H2O,
+                            Beta_0_MX_MEG, Beta_1_MX_MEG, Cphi_MX_MEG,
+                            Zm, nu_M, nu_X, Zx, n):
+    
+    pot_exc_calc = func_potencial_quimico_exc_SI(x_MEG_SF, Thetas_pot, n)
+    
+    ln_b_MX_H2O_MEG_ideal_calc = ln_b_MX_H2O_MEG_ideal(x_MEG_SF, b_MX_H2O, b_MX_MEG)
+    
+    #Pre Pitzer
+    A_phi_H2O = pitzer.A_phi_H2O(T)
+    rho_H2O, rho_MEG, epsilon_r_H2O, epsilon_r_MEG = pitzer.rho_and_epsilon_r_of_pures(T)
+    A_phi_MEG = pitzer.A_phi_MEG(A_phi_H2O, rho_H2O, epsilon_r_H2O, rho_MEG, epsilon_r_MEG)
+    ln_gamma_MX_H2O = pitzer.ln_gamma_MX_SI(nu_M, nu_X, Zm, Zx, b_MX_H2O, A_phi_H2O, Beta_0_MX_H2O, Beta_1_MX_H2O, Cphi_MX_H2O)
+    ln_gamma_MX_MEG = pitzer.ln_gamma_MX_SI(nu_M, nu_X, Zm, Zx, b_MX_MEG, A_phi_MEG, Beta_0_MX_MEG, Beta_1_MX_MEG, Cphi_MX_MEG)
+    
+    #Pitzer Ideal
+    ln_gamma_MX_H2O_MEG_ideal_calc = ln_gamma_MX_H2O_MEG_ideal(x_MEG_SF, ln_gamma_MX_H2O, ln_gamma_MX_MEG)
+    
+    #Pitzer Calculado
+    rho_H2O_MEG, epsilon_r_H2O_MEG = pitzer.rho_and_epsilon_r_of_mixing(rho_H2O, rho_MEG, epsilon_r_H2O, epsilon_r_MEG, w_H2O_SF, x_MEG_SF, x_H2O_SF, w_MEG_SF, T)
+    A_phi_H2O_MEG = pitzer.A_phi_of_Mixing(rho_H2O_MEG, rho_H2O, epsilon_r_H2O_MEG, epsilon_r_H2O, T)
+    Beta_0_MX_H2O_MEG, Beta_1_MX_H2O_MEG, Cphi_MX_H2O_MEG = pitzer.Pitzer_parameters_in_mixtures_exc_SI(Beta_0_MX_H2O, Beta_1_MX_H2O, Cphi_MX_H2O, Beta_1_MX_MEG, epsilon_r_H2O, epsilon_r_MEG, epsilon_r_H2O_MEG, x_MEG_SF)
+    
+    def minimizacao(b_MX_H2O_MEG):
+        ln_gamma_MX_H2O_MEG = pitzer.ln_gamma_MX_SI(nu_M, nu_X, Zm, Zx, b_MX_H2O_MEG, A_phi_H2O_MEG, Beta_0_MX_H2O_MEG, Beta_1_MX_H2O_MEG, Cphi_MX_H2O_MEG, False)
+        ln_b_MX_H2O_MEG = log(b_MX_H2O_MEG)
+        return (pot_exc_calc - (ln_b_MX_H2O_MEG - ln_b_MX_H2O_MEG_ideal_calc) - (ln_gamma_MX_H2O_MEG - ln_gamma_MX_H2O_MEG_ideal_calc))**2
+
+
+    x0 = empty(len(ln_b_MX_H2O_MEG_ideal_calc))
+    for i in range(0, len(ln_b_MX_H2O_MEG_ideal_calc)):
+      x0[i] = exp(ln_b_MX_H2O_MEG_ideal_calc[i])
+
+    b_MX_H2O_MEG_otimizado = fsolve(minimizacao,x0)
+    
+    ln_gamma_MX_H2O_MEG_otimizado = pitzer.ln_gamma_MX_SI(nu_M, nu_X, Zm, Zx, b_MX_H2O_MEG_otimizado, A_phi_H2O_MEG, Beta_0_MX_H2O_MEG, Beta_1_MX_H2O_MEG, Cphi_MX_H2O_MEG,False)
+    gamma_MX_H2O_MEG_otimizado = exp(ln_gamma_MX_H2O_MEG_otimizado)
+    return b_MX_H2O_MEG_otimizado, gamma_MX_H2O_MEG_otimizado
