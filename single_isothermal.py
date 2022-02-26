@@ -1,5 +1,6 @@
 #%%
 import sys
+from tkinter.tix import COLUMN
 
 sys.path.append('Modulos')
 
@@ -14,6 +15,7 @@ from Modulos import solubilidade
 from Modulos import excesso
 from Modulos import estatistica
 from Modulos import filtro_dados
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 
@@ -31,6 +33,17 @@ nu_X = df.loc['Coef esteq anion', 'ParamValor']
 mm_MX = df.loc['Massa molar sal (g/mol)', 'ParamValor']
 MM_MX = mm_MX/1000 #Kg/mol
 DeltaG_transf = df.loc['DeltaG transf (J/mol)', 'ParamValor']
+nome_cation = df.loc['Cation', 'ParamValor']
+nome_anion = df.loc['Anion', 'ParamValor']
+
+if nu_M==1 and nu_X==1:
+    nome_sal = nome_cation + nome_anion
+elif nu_M==1 and nu_X!=1:
+    nome_sal = nome_cation + nome_anion + str(nu_X)
+elif nu_M!=1 and nu_X==1:
+    nome_sal = nome_cation + str(nu_M) + nome_anion
+else:
+    nome_sal = nome_cation + str(nu_M) + nome_anion + str(nu_X)
 
 #Coef. Pitzer
 Beta_0 = df.loc['Beta0_ref_25C', 'ParamValor']
@@ -264,9 +277,77 @@ plt.plot(x_MEG_SF_oti, gamma_MX_H2O_MEG_otimizacao, label=T_filtro)
 plt.title("gamma_MX_H2O_MEG Calc")
 plt.legend()
 
+fig4 = plt.figure(4)
+plt.xlabel("x_MEG_SF")
+plt.ylabel("ln_gamma")
+plt.plot(x_MEG_SF_All,ln_gamma_MX_H2O_MEG, '.')
+plt.plot(x_MEG_SF_oti, log(gamma_MX_H2O_MEG_otimizacao), label=T_filtro)
+plt.title("gamma_MX_H2O_MEG Calc")
+plt.legend()
 
+fig5 = plt.figure(5)
+plt.xlabel("x_MEG_SF")
+plt.ylabel("ln_b")
+plt.plot(x_MEG_SF_All, ln_b_MX_H2O_MEG, '.')
+plt.plot(x_MEG_SF_oti, log(b_MX_H2O_MEG_otimizacao), label=T_filtro)
+plt.title("b_MX_H2O_MEG Calc")
+plt.legend()
 
+pp = PdfPages(f'saida_{nome_sal}_{int(T_filtro)}_SI.pdf')
+plt.savefig(pp, format='pdf')
+pp.savefig(fig1)
+pp.savefig(fig2)
+pp.savefig(fig3)
+pp.savefig(fig4)
+pp.savefig(fig5)
+pp.close()
 
-plt.show()
+#Resultados
+pd.ExcelWriter(f'saida_{nome_sal}_{int(T_filtro)}_SI.xlsx', engine='openpyxl') 
+#result = pd.read_excel(f'{nome_sal}_results.xlsx')
+
+#Pitzer
+
+T_filtro_df = pd.DataFrame(T_filtro, columns=['T potencial'])
+Beta_1_MX_MEG_df = pd.DataFrame(Beta_1_MX_MEG, columns=['Beta 1 MX MEG'])
+Beta_1_MX_H2O_MEG_df = pd.DataFrame(Beta_1_MX_H2O_MEG, columns=['Beta 1 MX H2O MEG'])
+
+#Potencial quimico
+x_MEG_df = pd.DataFrame(x_MEG_SF_All, columns=['x_MEG_SF'])
+pot_df = pd.DataFrame(potencial_quimico_exc, columns=['Potencial exp'])
+pot_calc_df = pd.DataFrame(pot_calc, columns=['Potencial calc'])
+Thetas_pot_df = pd.DataFrame(Thetas_pot, columns=['Thetas pot'])
+R_2_pot_df = pd.DataFrame({'R2 pot':[R_2_pot]})
+AAD_pot_df = pd.DataFrame({'AAD pot':[AAD_pot]})
+maxAD_pot_df = pd.DataFrame({'maxAD pot':[maxAD_pot]})
+AARD_pot_df = pd.DataFrame({'AARD pot':[AARD_pot]})
+maxARD_pot_df = pd.DataFrame({'maxARD pot':[maxARD_pot]})
+
+#Solubilidade mistura + Gamma
+x_MEG_SF_All_df = pd.DataFrame(x_MEG_SF_All, columns=['x_MEG_sol'])
+w_MX_All_df = pd.DataFrame(w_MX_All_True, columns=['w MX'])
+b_MX_H2O_MEG_df = pd.DataFrame(b_MX_H2O_MEG, columns=['b_mix exp'])
+gamma_MX_H2O_MEG_df = pd.DataFrame(gamma_MX_H2O_MEG, columns=['gamma exp'])
+x_MEG_SF_oti_df = pd.DataFrame(x_MEG_SF_oti, columns=['x MEG SF calc'])
+w_MEG_SF_oti_df = pd.DataFrame(w_MEG_SF_oti, columns=['w MEG SF calc'])
+b_MX_H2O_MEG_otimizacao_df = pd.DataFrame(b_MX_H2O_MEG_otimizacao, columns=['b_MX_H2O_MEG_otimizado'])
+gamma_MX_H2O_MEG_otimizacao_df = pd.DataFrame(gamma_MX_H2O_MEG_otimizacao, columns=['gamma_MX_H2O_MEG_otimizado'])
+R_2_b_df = pd.DataFrame({'R2 b':[R_2_b]})
+AAD_b_df = pd.DataFrame({'AAD b':[AAD_b]})
+maxAD_b_df = pd.DataFrame({'maxAD b':[maxAD_b]})
+AARD_b_df = pd.DataFrame({'AARD b':[AARD_b]})
+maxARD_b_df = pd.DataFrame({'maxARD b':[maxARD_b]})
+R_2_g_df = pd.DataFrame({'R2 g':[R_2_gamma]})
+AAD_g_df = pd.DataFrame({'AAD g':[AAD_g]})
+maxAD_g_df = pd.DataFrame({'maxAD g':[maxAD_g]})
+AARD_g_df = pd.DataFrame({'AARD g':[AARD_g]})
+maxARD_g_df = pd.DataFrame({'maxARD g':[maxARD_g]})
+b_MX_estimado_df = pd.DataFrame(b_MX_H2O_MEG_est, columns=['b_MX_H2O_MEG_est'])
+gamma_MX_estimado_df = pd.DataFrame(gamma_MX_H2O_MEG_est, columns=['gamma_MX_H2O_MEG_est'])
+
+result = pd.concat([T_filtro_df,x_MEG_df,pot_df, pot_calc_df, Thetas_pot_df, R_2_pot_df, AAD_pot_df, maxAD_pot_df, AARD_pot_df, maxARD_pot_df, Beta_1_MX_MEG_df, Beta_1_MX_H2O_MEG_df, x_MEG_SF_All_df, w_MX_All_df, b_MX_H2O_MEG_df,b_MX_estimado_df, gamma_MX_H2O_MEG_df, gamma_MX_estimado_df, R_2_b_df, AAD_b_df, maxAD_b_df, AARD_b_df, maxARD_b_df, R_2_g_df, AAD_g_df,  maxAD_g_df, AARD_g_df, maxARD_g_df, x_MEG_SF_oti_df, w_MEG_SF_oti_df, b_MX_H2O_MEG_otimizacao_df, gamma_MX_H2O_MEG_otimizacao_df], axis=1)
+result.to_excel(f'saida_{nome_sal}_{int(T_filtro)}_SI.xlsx', sheet_name = nome_sal, header=True, index=False)
+
+#plt.show()
 # %%
 

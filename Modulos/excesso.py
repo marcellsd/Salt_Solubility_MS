@@ -290,12 +290,13 @@ def otimizacao_b_MX_H2O_MEG_SI(x_MEG_SF, w_H2O_SF, x_H2O_SF, w_MEG_SF, T,
     def minimizacao(b_MX_H2O_MEG):
         ln_gamma_MX_H2O_MEG = pitzer.ln_gamma_MX_SI(nu_M, nu_X, Zm, Zx, b_MX_H2O_MEG, A_phi_H2O_MEG, Beta_0_MX_H2O_MEG, Beta_1_MX_H2O_MEG, Cphi_MX_H2O_MEG, False)
         ln_b_MX_H2O_MEG = log(b_MX_H2O_MEG)
-        return (pot_exc_calc - (ln_b_MX_H2O_MEG - ln_b_MX_H2O_MEG_ideal_calc) - (ln_gamma_MX_H2O_MEG - ln_gamma_MX_H2O_MEG_ideal_calc))**2
+        min = (pot_exc_calc - (ln_b_MX_H2O_MEG - ln_b_MX_H2O_MEG_ideal_calc) - (ln_gamma_MX_H2O_MEG - ln_gamma_MX_H2O_MEG_ideal_calc))**2
+        return min
 
 
     x0 = empty(len(ln_b_MX_H2O_MEG_ideal_calc))
     for i in range(0, len(ln_b_MX_H2O_MEG_ideal_calc)):
-      x0[i] = exp(ln_b_MX_H2O_MEG_ideal_calc[i])
+        x0[i] = exp(ln_b_MX_H2O_MEG_ideal_calc[i])
 
     b_MX_H2O_MEG_otimizado = fsolve(minimizacao,x0)
     

@@ -37,6 +37,17 @@ nu_X = df.loc['Coef esteq anion', 'ParamValor']
 mm_MX = df.loc['Massa molar sal (g/mol)', 'ParamValor']
 MM_MX = mm_MX/1000 #Kg/mol
 DeltaG_transf = df.loc['DeltaG transf (J/mol)', 'ParamValor']
+nome_cation = df.loc['Cation', 'ParamValor']
+nome_anion = df.loc['Anion', 'ParamValor']
+
+if nu_M==1 and nu_X==1:
+    nome_sal = nome_cation + nome_anion
+elif nu_M==1 and nu_X!=1:
+    nome_sal = nome_cation + nome_anion + str(nu_X)
+elif nu_M!=1 and nu_X==1:
+    nome_sal = nome_cation + str(nu_M) + nome_anion
+else:
+    nome_sal = nome_cation + str(nu_M) + nome_anion + str(nu_X)
 
 #Coef. Pitzer
 Beta_0 = df.loc['Beta0_ref_25C', 'ParamValor']
@@ -130,13 +141,16 @@ if len(T_filtro) != 1:
     R_2_MEG = estatistica.coef_determinacao2(b_MX_MEG_bin, b_MX_MEG_bin_calc)
     
     #Gráficos Molalidade x Temperatura
-    plt.figure(0)
+    
+    fig0 = plt.figure(0)
     plt.xlabel("T_h2o")
     plt.ylabel("b_h2o")
     plt.plot(T_bin_H2O, b_MX_H2O_bin, 'y.')
     plt.plot(T_bin_H2O_a, b_H2O_calc[:], 'r-')
     plt.title("Modelo X Experimental h2o")
-    plt.figure(1)
+    
+    
+    fig1 = plt.figure(1)
     plt.xlabel("T_MEG")
     plt.ylabel("b_MEG")
     plt.plot(T_bin_MEG, b_MX_MEG_bin, 'y.')
@@ -365,10 +379,25 @@ for i in range(0, len(T_pred)):
 plt.title("gamma_MX_H2O_MEG Pred")
 plt.legend()
 
-plt.show()
+#plt.show()
+
+from matplotlib.backends.backend_pdf import PdfPages
+pp = PdfPages(f'saida_{nome_sal}_MI.pdf')
+plt.savefig(pp, format='pdf')
+pp.savefig(fig0)
+pp.savefig(fig1)
+pp.savefig(fig2)
+pp.savefig(fig3)
+pp.savefig(fig4)
+pp.savefig(fig5)
+pp.savefig(fig6)
+pp.savefig(fig7)
+pp.close()
 
 #Resultados
-result = pd.read_excel('saida_NaCl.xlsx')
+pd.ExcelWriter(f'saida_{nome_sal}_MI.xlsx', engine='openpyxl') 
+#result = pd.read_excel('saida_sal_MultI.xlsx')
+
 #Solubilidade puros
 T_bin_H2O_df = pd.DataFrame(T_bin_H2O, columns=['T_H2O'])
 T_bin_MEG_df = pd.DataFrame(T_bin_MEG, columns=['T_MEG'])
@@ -417,13 +446,12 @@ AAD_g_df = pd.DataFrame({'AAD g':[AAD_g]})
 maxAD_g_df = pd.DataFrame({'maxAD g':[maxAD_g]})
 AARD_g_df = pd.DataFrame({'AARD g':[AARD_g]})
 maxARD_g_df = pd.DataFrame({'maxARD g':[maxARD_g]})
+b_MX_estimado_df = pd.DataFrame(b_MX_H2O_MEG_est, columns=['b_MX_H2O_MEG_est'])
+gamma_MX_estimado_df = pd.DataFrame(gamma_MX_H2O_MEG_est, columns=['gamma_MX_H2O_MEG_est'])
 
 
-
-result = pd.concat([b_bin_H2O_df,T_bin_H2O_df, b_bin_MEG_df, T_bin_MEG_df,Thetas_H2O_df,Thetas_MEG_df,r2_H2O_df,r2_MEG_df,x_MEG_df,pot_df, pot_calc_df, T_All_tratado_df, Thetas_pot_df, R_2_pot_df, AAD_pot_df, maxAD_pot_df, AARD_pot_df, maxARD_pot_df, Beta_1_MX_MEG_df, Beta_1_MX_H2O_MEG_df, T_all_df1, x_MEG_SF_All_df, w_MX_All_df,T_all_df2, b_MX_H2O_MEG_df, gamma_MX_H2O_MEG_df , x_MEG_SF_oti_df, w_MEG_SF_oti_df, T_filtro_df, b_MX_H2O_MEG_otimizacao_df, gamma_MX_H2O_MEG_otimizacao_df, R_2_b_df, AAD_b_df, maxAD_b_df, AARD_b_df, maxARD_b_df, R_2_g_df, AAD_g_df,  maxAD_g_df, AARD_g_df, maxARD_g_df], axis=1)
-result.to_excel('saida_NaCl.xlsx', sheet_name ='saida', header=True, index=False)
-
-
+result = pd.concat([b_bin_H2O_df,T_bin_H2O_df, b_bin_MEG_df, T_bin_MEG_df,Thetas_H2O_df,Thetas_MEG_df,r2_H2O_df,r2_MEG_df,x_MEG_df,pot_df, pot_calc_df, T_All_tratado_df, Thetas_pot_df, R_2_pot_df, AAD_pot_df, maxAD_pot_df, AARD_pot_df, maxARD_pot_df, Beta_1_MX_MEG_df, Beta_1_MX_H2O_MEG_df, T_all_df1, x_MEG_SF_All_df, w_MX_All_df,T_all_df2, b_MX_H2O_MEG_df,b_MX_estimado_df, gamma_MX_H2O_MEG_df, gamma_MX_estimado_df, R_2_b_df, AAD_b_df, maxAD_b_df, AARD_b_df, maxARD_b_df, R_2_g_df, AAD_g_df,  maxAD_g_df, AARD_g_df, maxARD_g_df, x_MEG_SF_oti_df, w_MEG_SF_oti_df, T_filtro_df, b_MX_H2O_MEG_otimizacao_df, gamma_MX_H2O_MEG_otimizacao_df], axis=1)
+result.to_excel(f'saida_{nome_sal}_MI.xlsx', sheet_name = nome_sal, header=True, index=False)
 
 
 # %%
