@@ -4,9 +4,9 @@ Created on Wed Jun 16 17:09:45 2021
 
 @author: marcell
 """
-from Modulos import constants
+from Modules import constants
 
-def fracao_massica_para_molalidade(MM_MX, w_MX):
+def mass_fraction_to_molality(MM_MX, w_MX):
     return (w_MX/MM_MX)/(1-w_MX)
 
 

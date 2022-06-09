@@ -1,16 +1,16 @@
 from numpy import amax, sum, mean, empty
-#Calculo R2
-def coef_determinacao(y, ycalc):
+# R² calculation
+def coefficient_of_determination(y, ycalc):
     mean = sum(y)/len(y)
-    residuo = (ycalc - mean)**2
-    SQ_residuo = sum(residuo)
-    variancia = (y - mean)**2
-    SQ_Total = sum(variancia)
-    R_2 = SQ_residuo/SQ_Total
+    residue = (ycalc - mean)**2
+    SQ_residue = sum(residue)
+    variance = (y - mean)**2
+    SQ_Total = sum(variance)
+    R_2 = SQ_residue/SQ_Total
     return R_2
 
-
-def coef_determinacao2(y, ycalc):
+# R² calculation
+def coefficient_of_determination2(y, ycalc):
     SSres_v = empty(len(y))
     for i in range(len(SSres_v)):
         SSres_v[i] = (y[i]-ycalc[i])**2
@@ -28,22 +28,22 @@ def DAM_DMR(yexp, ycalc):
     for i in range(len(AD)):
         AD[i] = abs(yexp[i]-ycalc[i])
         ARD[i] = abs((yexp[i]-ycalc[i])/yexp[i])
-    # Desvio Absoluto Médio
+    # Mean absolute deviation
     AAD = mean(AD)
-    # Desvio Absoluto Máximo
+    # Maximum absolute deviation
     maxAD = amax(AD)
-    # Desvio Relativo Absoluto Médio
+    # Mean Absolute Relative Deviation
     AARD = mean(ARD)
-    # Desvio Relativo Absoluto Máximo
+    # Maximum Absolute Relative Deviation
     maxARD = amax(ARD)
     return AAD, maxAD, AARD, maxARD
 
 
-def coef_determinacao_JAFO(y, ycalc):
+def coefficient_of_determination_JAFO(y, ycalc):
     mean = sum(y)/len(y)
-    # Soma de Quadrados Total (TSS)
+    # Total Sum of Squares (TSS)
     TSS = sum((y-mean)**2)
-    # Soma de Quadrados dos Resíduos (RSS)
+    # Residual Sum of Squares (RSS)
     RSS = sum((y-ycalc)**2)
     R_2 = (TSS - RSS)/TSS
     return R_2   

@@ -7,7 +7,7 @@ Created on Tue May 25 18:07:04 2021
 from numpy import exp, log, sqrt, empty
 from pyswarm import pso
 from scipy.optimize import minimize, fsolve
-from Modulos import constants
+from Modules import constants
 
 def rho_and_epsilon_r_of_pures(T):
     # Calcula as Densidades Absolutas e as Constantes Dielétricas
