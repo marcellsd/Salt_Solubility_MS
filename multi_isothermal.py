@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 from Modules import excess
 from Modules import statistics
 from Modules import dataFilter
-
 from tkinter import filedialog, Tk
 
 root = Tk()
@@ -46,7 +45,7 @@ elif nu_M!=1 and nu_X==1:
 else:
     salt_name = cation_name + str(nu_M) + anion_name + str(nu_X)
 
-#Coef. Pitzer
+#Pitzer Coefficients
 Beta_0 = df.loc['Beta0_ref_25C', 'Value']
 Beta_1 = df.loc['Beta1_ref_25C', 'Value']
 Cphi = df.loc['Cphi_ref_25C', 'Value']
@@ -54,7 +53,7 @@ Cphi = df.loc['Cphi_ref_25C', 'Value']
 data_file_sol = pd.read_excel(data_file_name, 'Data')
 T = pd.DataFrame(data_file_sol, columns=['T (K)']).to_numpy()
 w_H2O_SF = pd.DataFrame(data_file_sol, columns=['w_H20_SF']).to_numpy()
-w_MX_all = pd.DataFrame(data_file_sol, columns=['wsal']).to_numpy()
+w_MX_all = pd.DataFrame(data_file_sol, columns=['w_salt']).to_numpy()
 T_filter = pd.DataFrame(data_file_sol, columns=['T (K)']).drop_duplicates().to_numpy()
 
 #if w_H2O_SF ≃ 1 -> Water-Salt binary
@@ -62,11 +61,8 @@ T_filter = pd.DataFrame(data_file_sol, columns=['T (K)']).drop_duplicates().to_n
 
 #Separation of data into ternary and binary
 w_MX_H2O_bin_L, w_H2O_bin_L, T_bin_H2O_L = [], [], []
-
 w_MEG_bin_L, w_MX_MEG_bin_L, T_bin_MEG_L = [], [], []
-
 w_H2O_tern_L, w_MEG_tern_L, w_MX_tern_L, w_H2O_SF_tern_L, w_MEG_SF_tern_L, T_tern_L = [], [], [], [], [], []
-
 w_H2O_All_L, w_MEG_All_L, w_MX_All_L, w_H2O_SF_All_L, w_MEG_SF_All_L, T_All_L = [], [], [], [], [], []   
 
 vector_length = len(w_H2O_SF)
@@ -101,15 +97,12 @@ for i in range (0, len(w_MX_MEG_bin_L)):
 
 #List to array
 w_MX_H2O_bin, w_H2O_bin, T_bin_H2O  = array(w_MX_H2O_bin_L), array(w_H2O_bin_L), array(T_bin_H2O_L)
-
 w_MEG_bin, w_MX_MEG_bin, T_bin_MEG  = array(w_MEG_bin_L), array(w_MX_MEG_bin_L), array(T_bin_MEG_L)
-
 w_H2O_tern, w_MEG_tern, w_MX_tern, w_H2O_SF_tern, T_tern = array(w_H2O_tern_L), array(w_MEG_tern_L), array(w_MX_tern_L), array(w_H2O_SF_tern_L), array(T_tern_L)
-
 w_H2O_All, w_MEG_All, w_MX_All, w_H2O_SF_All, w_MEG_SF_All, T_All = array(w_H2O_All_L), array(w_MEG_All_L), array(w_MX_All_L), array(w_H2O_SF_All_L), array(w_MEG_SF_All_L), array(T_All_L)
 
 
-#Transform Mass fraction into Molar Salt-Free
+#Transforming Mass fraction into Molar Salt-Free
 x_MEG_SF_All = transformations.x_MEG_SF(w_H2O_SF_All)
 x_H2O_SF_All = (1-x_MEG_SF_All)
 
@@ -123,7 +116,6 @@ if len(T_filter) != 1:
     Thetas_H2O = solubility.n_linear_regression(T_bin_H2O, b_MX_H2O_bin)
     Thetas_MEG = solubility.n_linear_regression(T_bin_MEG, b_MX_MEG_bin)
     
-    
     T_bin_H2O_a = linspace(min(T_bin_H2O),max(T_bin_H2O), 100, endpoint=True)
     T_bin_MEG_a = linspace(min(T_bin_MEG),max(T_bin_MEG), 100, endpoint=True)
     
@@ -131,6 +123,7 @@ if len(T_filter) != 1:
     b_MEG_calc = solubility.func_solubility(T_bin_MEG_a, Thetas_MEG)
     
     #Calculo do R²
+
     b_MX_H2O_bin_calc = solubility.func_solubility(T_bin_H2O, Thetas_H2O)
     b_MX_MEG_bin_calc = solubility.func_solubility(T_bin_MEG, Thetas_MEG)
     
@@ -146,7 +139,6 @@ if len(T_filter) != 1:
     plt.plot(T_bin_H2O_a, b_H2O_calc[:], 'r-')
     plt.title("Model X Experimental h2o")
     
-    
     fig1 = plt.figure(1)
     plt.xlabel("T_MEG")
     plt.ylabel("b_MEG")
@@ -159,6 +151,7 @@ if len(T_filter) != 1:
 if len(T_filter) != 1:
     b_H2O_MX_calc = solubility.func_solubility(T_All, Thetas_H2O)
     b_MEG_MX_calc = solubility.func_solubility(T_All, Thetas_MEG)
+
 else: 
     b_H2O_MX_calc = b_MX_H2O_bin
     b_MEG_MX_calc = b_MX_MEG_bin
@@ -245,15 +238,15 @@ Beta_0_MX_MEG_filter, Beta_1_MX_MEG_filter, Cphi_MX_MEG_filter = dataFilter.filt
 #Mixture solubility calculations
 number_of_points = 31
 
-x_MEG_SF_optmized = linspace(0.0,1.0,number_of_points,endpoint=True)
-x_H2O_SF_optmized = 1-x_MEG_SF_optmized
-w_MEG_SF_optmized = transformations.w_MEG_SF(x_MEG_SF_optmized)
-w_H2O_SF_optmized = 1-w_MEG_SF_optmized
+x_MEG_SF_optimizated = linspace(0.0,1.0,number_of_points,endpoint=True)
+x_H2O_SF_optimizated = 1-x_MEG_SF_optimizated
+w_MEG_SF_optimizated = transformations.w_MEG_SF(x_MEG_SF_optimizated)
+w_H2O_SF_optimizated = 1-w_MEG_SF_optimizated
 
-b_MX_H2O_MEG_optimization = empty([number_of_points, t_filter_length])
-gamma_MX_H2O_MEG_optimization = empty([number_of_points, t_filter_length])
+b_MX_H2O_MEG_optimizated = empty([number_of_points, t_filter_length])
+gamma_MX_H2O_MEG_optimizated = empty([number_of_points, t_filter_length])
 for i in range(0, t_filter_length):
-    b_MX_H2O_MEG_optimization[:,i], gamma_MX_H2O_MEG_optimization[:,i] = excess.optimization_b_MX_H2O_MEG(x_MEG_SF_optmized, w_H2O_SF_optmized, x_H2O_SF_optmized, w_MEG_SF_optmized, T_filter[i], 
+    b_MX_H2O_MEG_optimizated[:,i], gamma_MX_H2O_MEG_optimizated[:,i] = excess.optimization_b_MX_H2O_MEG(x_MEG_SF_optimizated, w_H2O_SF_optimizated, x_H2O_SF_optimizated, w_MEG_SF_optimizated, T_filter[i], 
                                                                                                      Thetas_pot, Thetas_H2O, Thetas_MEG, 
                                                                                                      Beta_0_MX_H2O_filter[i], Beta_1_MX_H2O_filter[i], Cphi_MX_H2O_filter[i],
                                                                                                      Beta_0_MX_MEG_filter[i], Beta_1_MX_MEG_filter[i], Cphi_MX_MEG_filter[i],
@@ -288,7 +281,7 @@ Beta_0_MX_MEG_pred, Beta_1_MX_MEG_pred, Cphi_MX_MEG_pred = pitzer.pitzerParamete
 b_MX_H2O_MEG_pred = empty([number_of_points, len(T_pred)])
 gamma_MX_H2O_MEG_pred = empty([number_of_points, len(T_pred)])
 for i in range(0, len(T_pred)):
-    b_MX_H2O_MEG_pred[:,i], gamma_MX_H2O_MEG_pred[:,i] = excess.optimization_b_MX_H2O_MEG(x_MEG_SF_optmized, w_H2O_SF_optmized, x_H2O_SF_optmized, w_MEG_SF_optmized, T_pred[i], 
+    b_MX_H2O_MEG_pred[:,i], gamma_MX_H2O_MEG_pred[:,i] = excess.optimization_b_MX_H2O_MEG(x_MEG_SF_optimizated, w_H2O_SF_optimizated, x_H2O_SF_optimizated, w_MEG_SF_optimizated, T_pred[i], 
                                                                                                      Thetas_pot, Thetas_H2O, Thetas_MEG, 
                                                                                                      Beta_0_MX_H2O_pred[i], Beta_1_MX_H2O_pred[i], Cphi_MX_H2O_pred[i],
                                                                                                      Beta_0_MX_MEG_pred[i], Beta_1_MX_MEG_pred[i], Cphi_MX_MEG_pred[i],
@@ -335,8 +328,8 @@ plt.ylabel("b")
 for i in range(0,t_filter_length):
     plt.plot(x_MEG_SF_All_L[i], b_MX_H2O_MEG_L[i], '.')
 for i in range(0, t_filter_length):
-    plt.plot(x_MEG_SF_optmized, b_MX_H2O_MEG_optimization[:,i], label=T_filter[i])
-plt.title("b_MX_H2O_MEG Calc")
+    plt.plot(x_MEG_SF_optimizated, b_MX_H2O_MEG_optimizated[:,i], label=T_filter[i])
+plt.title("Calculated b_MX_H2O_MEG")
 plt.legend()
 
 #Graphic gamma
@@ -348,7 +341,7 @@ plt.ylabel("gamma")
 for i in range(0,t_filter_length):
     plt.plot(x_MEG_SF_All_L[i],gamma_MX_H2O_MEG_L[i], '.')
 for i in range(0, t_filter_length):
-    plt.plot(x_MEG_SF_optmized, gamma_MX_H2O_MEG_optimization[:,i], label=T_filter[i])
+    plt.plot(x_MEG_SF_optimizated, gamma_MX_H2O_MEG_optimizated[:,i], label=T_filter[i])
 plt.title("Calculated gamma_MX_H2O_MEG ")
 plt.legend()
 
@@ -368,7 +361,7 @@ ax6.set_prop_cycle('color', colors)
 plt.xlabel("x_MEG_SF")
 plt.ylabel("b")
 for i in range(0, len(T_pred)):
-    plt.plot(x_MEG_SF_optmized, b_MX_H2O_MEG_pred[:,i], label=T_pred[i])
+    plt.plot(x_MEG_SF_optimizated, b_MX_H2O_MEG_pred[:,i], label=T_pred[i])
 plt.title("Predicted b_MX_H2O_MEG")
 plt.legend()
 
@@ -378,7 +371,7 @@ ax7.set_prop_cycle('color', colors)
 plt.xlabel("x_MEG_SF")
 plt.ylabel("gamma")
 for i in range(0, len(T_pred)):
-    plt.plot(x_MEG_SF_optmized, gamma_MX_H2O_MEG_pred[:,i], label=T_pred[i])
+    plt.plot(x_MEG_SF_optimizated, gamma_MX_H2O_MEG_pred[:,i], label=T_pred[i])
 plt.title("Predicted gamma_MX_H2O_MEG")
 plt.legend()
 
@@ -433,11 +426,11 @@ w_MX_All_df = pd.DataFrame(w_MX_All, columns=['w MX'])
 T_all_df2 = pd.DataFrame(T_All, columns=['T sol mix'])
 b_MX_H2O_MEG_df = pd.DataFrame(b_MX_H2O_MEG, columns=['b_mix exp'])
 gamma_MX_H2O_MEG_df = pd.DataFrame(gamma_MX_H2O_MEG, columns=['gamma exp'])
-x_MEG_SF_optmized_df = pd.DataFrame(x_MEG_SF_optmized, columns=['x MEG SF calc'])
-w_MEG_SF_optmized_df = pd.DataFrame(w_MEG_SF_optmized, columns=['w MEG SF calc'])
-b_MX_H2O_MEG_optimization_df = pd.DataFrame(b_MX_H2O_MEG_optimization)
-gamma_MX_H2O_MEG_optimization_df = pd.DataFrame(gamma_MX_H2O_MEG_optimization)
-T_filter_df = pd.DataFrame(T_filter, columns=['Temperaturas isotermas'])
+x_MEG_SF_optimizated_df = pd.DataFrame(x_MEG_SF_optimizated, columns=['x MEG SF calc'])
+w_MEG_SF_optimizated_df = pd.DataFrame(w_MEG_SF_optimizated, columns=['w MEG SF calc'])
+b_MX_H2O_MEG_optimizated_df = pd.DataFrame(b_MX_H2O_MEG_optimizated)
+gamma_MX_H2O_MEG_optimizated_df = pd.DataFrame(gamma_MX_H2O_MEG_optimizated)
+T_filter_df = pd.DataFrame(T_filter, columns=['Isothermal Temperatures'])
 R_2_b_df = pd.DataFrame({'R2 b':[R_2_b]})
 AAD_b_df = pd.DataFrame({'AAD b':[AAD_b]})
 maxAD_b_df = pd.DataFrame({'maxAD b':[maxAD_b]})
@@ -452,6 +445,6 @@ b_MX_estimated_df = pd.DataFrame(b_MX_H2O_MEG_est, columns=['b_MX_H2O_MEG_est'])
 gamma_MX_estimated_df = pd.DataFrame(gamma_MX_H2O_MEG_est, columns=['gamma_MX_H2O_MEG_est'])
 
 
-result = pd.concat([b_bin_H2O_df,T_bin_H2O_df, b_bin_MEG_df, T_bin_MEG_df,Thetas_H2O_df,Thetas_MEG_df,r2_H2O_df,r2_MEG_df,x_MEG_df,pot_df, pot_calc_df, T_All_treated_df, Thetas_pot_df, R_2_pot_df, AAD_pot_df, maxAD_pot_df, AARD_pot_df, maxARD_pot_df, Beta_1_MX_MEG_df, Beta_1_MX_H2O_MEG_df, T_all_df1, x_MEG_SF_All_df, w_MX_All_df,T_all_df2, b_MX_H2O_MEG_df,b_MX_estimated_df, gamma_MX_H2O_MEG_df, gamma_MX_estimated_df, R_2_b_df, AAD_b_df, maxAD_b_df, AARD_b_df, maxARD_b_df, R_2_g_df, AAD_g_df,  maxAD_g_df, AARD_g_df, maxARD_g_df, x_MEG_SF_optmized_df, w_MEG_SF_optmized_df, T_filter_df, b_MX_H2O_MEG_optimization_df, gamma_MX_H2O_MEG_optimization_df], axis=1)
+result = pd.concat([b_bin_H2O_df,T_bin_H2O_df, b_bin_MEG_df, T_bin_MEG_df,Thetas_H2O_df,Thetas_MEG_df,r2_H2O_df,r2_MEG_df,x_MEG_df,pot_df, pot_calc_df, T_All_treated_df, Thetas_pot_df, R_2_pot_df, AAD_pot_df, maxAD_pot_df, AARD_pot_df, maxARD_pot_df, Beta_1_MX_MEG_df, Beta_1_MX_H2O_MEG_df, T_all_df1, x_MEG_SF_All_df, w_MX_All_df,T_all_df2, b_MX_H2O_MEG_df,b_MX_estimated_df, gamma_MX_H2O_MEG_df, gamma_MX_estimated_df, R_2_b_df, AAD_b_df, maxAD_b_df, AARD_b_df, maxARD_b_df, R_2_g_df, AAD_g_df,  maxAD_g_df, AARD_g_df, maxARD_g_df, x_MEG_SF_optimizated_df, w_MEG_SF_optimizated_df, T_filter_df, b_MX_H2O_MEG_optimizated_df, gamma_MX_H2O_MEG_optimizated_df], axis=1)
 result.to_excel(f'output_{salt_name}_MI.xlsx', sheet_name = salt_name, header=True, index=False)
 
