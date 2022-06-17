@@ -1,9 +1,0 @@
-Cria nova Branch: git checkout -b nomedabranch
-Adicionar modificações ao commit: git add --all
-Commitar as midificações: git commit -m "comentário sobre as modificações"
-Subir o repositório pela primeira vez: git push --set-upstream origin nomedabranch
-Outras vezes : git push
-
-mudar de branch: git checkout nomedabranch
-
-git status
