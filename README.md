@@ -53,6 +53,3 @@ The outputs are pdf file with the graphics and a xlsx file with the calculated v
 ## Comments
 
 Feel free to let me know if you have any questions or comments about this code.
-
-## Credits
-
