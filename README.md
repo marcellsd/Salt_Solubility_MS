@@ -2,7 +2,6 @@
 
 This is a Python program to calculate the salt solubility in a mixture of solvents (water + MEG).
 
-
 ## Requirements
 
 You will need Python 3.7.0 or higher version installed on your OS with the following dependecies:
@@ -24,6 +23,8 @@ And so:
 ```
 pip install --upgrade pyswarm
 ```
+
+The input data file must be in a .xlsx format, following the examples of Data folder for single or multi temperatures. 
 
 ## Usage
 
@@ -47,7 +48,6 @@ python3 single_isothermal.py
 
 for data with just one temperature.
 
-The input data file must be in a .xlsx format, following the examples of Data folder for single or multi temperatures. 
 
 ## Comments
 
