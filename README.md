@@ -5,7 +5,7 @@ This is a Python program to calculate the salt solubility in a mixture of solven
 
 ## Requirements
 
-You need to have Python 3.7.0 or higher version installed on your OS with the following dependecies:
+You will need Python 3.7.0 or higher version installed on your OS with the following dependecies:
 * Numpy
 * Scipy
 * Pandas
