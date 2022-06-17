@@ -48,6 +48,7 @@ python3 single_isothermal.py
 
 for data with just one temperature.
 
+The outputs are pdf file with the graphics and a .xlsx file with the calculataded values.
 
 ## Comments
 
