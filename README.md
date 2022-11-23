@@ -1,6 +1,7 @@
 ## Introduction
 
 This is a python program to calculate the salt solubility in a mixture of solvents (water + MEG) through the Pitzer-Lorimer approach. Examples of the input files for single isotherm (SI) and multiple isotherms (MI) are available in the "Data" folder.
+This program was used and published as part of a research article in AIChE Journal: https://doi.org/10.1002/aic.17915
 
 ## Requirements
 
